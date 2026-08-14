@@ -6,7 +6,15 @@
     "esModuleInterop": true,
     "strict": true,
     "noImplicitAny": true,
-    "types": ["cypress", "node", "@badeball/cypress-cucumber-preprocessor"]
+    "skipLibCheck": true,
+    "types": [
+      "cypress",
+      "node",
+      "@badeball/cypress-cucumber-preprocessor"
+    ]
   },
-  "include": ["cypress/**/*.ts", "cypress.config.ts"]
+  "include": [
+    "cypress/**/*.ts",
+    "cypress.config.ts"
+  ]
 }
