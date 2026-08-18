@@ -3,12 +3,15 @@ name: Cypress BDD Tests
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
+
   workflow_dispatch:
 
 jobs:
   cypress-tests:
+    name: Cypress BDD Regression Suite
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -24,11 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Type check
+      - name: Run type check
         run: npm run typecheck
 
-      - name: Run Cypress BDD tests
-        run: npm test
+      - name: Run Cypress regression tests
+        run: npx cypress run --env tags="@regression"
 
       - name: Upload screenshots
         if: failure()
@@ -47,3 +50,23 @@ jobs:
           path: cypress/videos/
           if-no-files-found: ignore
           retention-days: 14
+
+  smoke-tests:
+    name: Cypress BDD Smoke Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cypress smoke tests
+        run: npx cypress run --env tags="@smoke"
