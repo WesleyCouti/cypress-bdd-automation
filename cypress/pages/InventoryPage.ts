@@ -1,23 +1,41 @@
 export class InventoryPage {
+  private readonly title = '[data-test="title"]';
+  private readonly inventoryItem = '[data-test="inventory-item"]';
+  private readonly cartBadge = '[data-test="shopping-cart-badge"]';
+  private readonly cartLink = '[data-test="shopping-cart-link"]';
+
   assertLoaded(): void {
     cy.url().should('include', '/inventory.html');
-    cy.get('[data-test="title"]').should('have.text', 'Products');
-    cy.get('[data-test="inventory-item"]').should('have.length.greaterThan', 0);
+
+    cy.get(this.title)
+      .should('be.visible')
+      .and('have.text', 'Products');
+
+    cy.get(this.inventoryItem)
+      .should('have.length.greaterThan', 0);
   }
 
   addProduct(productName: string): void {
-    cy.contains('[data-test="inventory-item"]', productName)
+    cy.contains(this.inventoryItem, productName)
       .should('be.visible')
       .within(() => {
-        cy.contains('button', 'Add to cart').click();
+        cy.contains('button', 'Add to cart')
+          .should('be.visible')
+          .click();
       });
   }
 
   assertCartCount(count: number): void {
-    cy.get('[data-test="shopping-cart-badge"]').should('have.text', String(count));
+    cy.get(this.cartBadge)
+      .should('be.visible')
+      .and('have.text', String(count));
   }
 
   openCart(): void {
-    cy.get('[data-test="shopping-cart-link"]').click();
+    cy.get(this.cartLink)
+      .should('be.visible')
+      .click();
+
+    cy.url().should('include', '/cart.html');
   }
 }
