@@ -7,11 +7,11 @@ Feature: Authentication
   @smoke
   Scenario: Successful login
     Given I am on the login page
-    When I log in with a valid user
+    When I authenticate with valid credentials
     Then the product catalog should be displayed
 
   @regression
   Scenario: Locked user cannot access the application
     Given I am on the login page
-    When I log in with a locked user
+    When I authenticate with locked user credentials
     Then I should see the locked user error message
