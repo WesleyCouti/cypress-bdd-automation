@@ -6,16 +6,25 @@ import { users } from '../data/users';
 const loginPage = new LoginPage();
 const inventoryPage = new InventoryPage();
 
+const lockedUserError =
+  'Sorry, this user has been locked out';
+
 Given('I am on the login page', () => {
   loginPage.visit();
 });
 
-When('I log in with a valid user', () => {
-  loginPage.login(users.standard.username, users.standard.password);
+When('I authenticate with valid credentials', () => {
+  loginPage.login(
+    users.standard.username,
+    users.standard.password
+  );
 });
 
-When('I log in with a locked user', () => {
-  loginPage.login(users.locked.username, users.locked.password);
+When('I authenticate with locked user credentials', () => {
+  loginPage.login(
+    users.locked.username,
+    users.locked.password
+  );
 });
 
 Then('the product catalog should be displayed', () => {
@@ -23,5 +32,5 @@ Then('the product catalog should be displayed', () => {
 });
 
 Then('I should see the locked user error message', () => {
-  loginPage.assertError('Sorry, this user has been locked out');
+  loginPage.assertError(lockedUserError);
 });
