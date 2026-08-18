@@ -2,20 +2,22 @@
   "name": "cypress-bdd-automation",
   "version": "1.0.0",
   "private": true,
-  "description": "E2E test automation portfolio using Cypress, TypeScript, Cucumber/Gherkin and GitHub Actions.",
+  "description": "E2E test automation framework using Cypress, TypeScript, Cucumber/Gherkin, Page Object Model and GitHub Actions.",
   "scripts": {
     "test": "cypress run",
     "test:chrome": "cypress run --browser chrome",
     "test:headed": "cypress run --headed",
-    "open": "cypress open",
+    "test:open": "cypress open",
+    "test:smoke": "cypress run --env tags='@smoke'",
+    "test:regression": "cypress run --env tags='@regression'",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "latest",
-    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
+    "@badeball/cypress-cucumber-preprocessor": "^23.2.1",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.4",
     "@types/node": "^22.10.2",
-    "cypress": "latest",
-    "esbuild": "latest",
-    "typescript": "latest"
+    "cypress": "^15.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2"
   }
 }
