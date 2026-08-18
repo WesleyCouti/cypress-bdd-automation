@@ -63,7 +63,7 @@ Scenario: Complete checkout successfully
 
 The `.feature` files describe business behavior while TypeScript step definitions implement the automation.
 
-This approach helps keep test scenarios understandable for technical and non-technical stakeholders.
+This approach helps keep test scenarios understandable for both technical and non-technical stakeholders.
 
 ---
 
@@ -181,7 +181,7 @@ This prevents repeated login implementation across multiple scenarios.
 
 User and checkout data are maintained separately from test implementation.
 
-This makes the scenarios easier to read and allows test data to evolve independently.
+This makes scenarios easier to read and allows test data to evolve independently.
 
 ### Stable Selectors
 
@@ -195,20 +195,62 @@ Tests rely on Cypress retryability and assertions instead of fixed waits.
 
 This reduces unnecessary timing dependencies and improves execution stability.
 
-### Smoke and Regression Classification
+### Smoke and Regression Execution
 
-Scenarios use tags such as:
+BDD scenarios are classified using Cucumber tags:
 
 ```text
 @smoke
 @regression
 ```
 
-to express their intended test scope and future execution strategy.
+These tags are actively used by GitHub Actions to run dedicated test suites.
+
+#### Smoke Suite
+
+```bash
+npx cypress run --env tags="@smoke"
+```
+
+Validated CI execution:
+
+```text
+3 scenarios passed
+0 failed
+1 scenario filtered as pending
+```
+
+The smoke suite currently validates:
+
+- Successful login
+- Add product to cart
+- Complete checkout
+
+#### Regression Suite
+
+```bash
+npx cypress run --env tags="@regression"
+```
+
+Validated CI execution:
+
+```text
+3 scenarios passed
+0 failed
+1 scenario filtered as pending
+```
+
+The regression suite currently validates:
+
+- Locked user behavior
+- Add product to cart
+- Complete checkout
+
+This approach allows critical-path validation and broader regression coverage to be executed independently.
 
 ### Continuous Integration
 
-The complete automation suite is executed through GitHub Actions in a clean CI environment.
+The automation suite is executed through GitHub Actions in a clean CI environment.
 
 ---
 
@@ -250,7 +292,7 @@ npm test
 Open Cypress Test Runner:
 
 ```bash
-npm run open
+npm run test:open
 ```
 
 Run tests with the browser visible:
@@ -271,39 +313,99 @@ Run TypeScript validation:
 npm run typecheck
 ```
 
+Run the Smoke suite:
+
+```bash
+npx cypress run --env tags="@smoke"
+```
+
+Run the Regression suite:
+
+```bash
+npx cypress run --env tags="@regression"
+```
+
 ---
 
 ## CI/CD Pipeline
 
-The project uses **GitHub Actions** to validate the automation framework.
+The project uses **GitHub Actions** to execute independent Smoke and Regression BDD suites.
 
 ```text
-Push / Pull Request
-        │
-        ▼
-Checkout repository
-        │
-        ▼
-Setup Node.js
-        │
-        ▼
-Install dependencies
-        │
-        ▼
-TypeScript validation
-        │
-        ▼
-Run Cypress BDD tests
-        │
-        ├───────────────┐
-        ▼               ▼
-Screenshots           Videos
-on failure           Artifacts
+                  Push / Pull Request
+                          │
+                          ▼
+                  Checkout Repository
+                          │
+                          ▼
+                     Setup Node.js
+                          │
+                          ▼
+                  Install Dependencies
+                          │
+                          ▼
+                 TypeScript Validation
+                          │
+               ┌──────────┴──────────┐
+               │                     │
+               ▼                     ▼
+        @smoke execution      @regression execution
+               │                     │
+               ▼                     ▼
+          Smoke Suite           Regression Suite
+               │                     │
+               └──────────┬──────────┘
+                          │
+                 ┌────────┴────────┐
+                 ▼                 ▼
+            Screenshots          Videos
+             on failure         Artifacts
 ```
 
 The workflow can also be manually triggered through the **Actions** tab.
 
 The current pipeline status is displayed by the badge at the top of this README.
+
+---
+
+## CI Execution
+
+The BDD test strategy is continuously validated through dedicated GitHub Actions jobs.
+
+### Current Validation
+
+| Suite | Scenarios Passed | Failed | Filtered |
+|---|---:|---:|---:|
+| Smoke | 3 | 0 | 1 |
+| Regression | 3 | 0 | 1 |
+
+Both suites currently pass successfully in CI.
+
+### Smoke Coverage
+
+```text
+Successful login
+      ↓
+Shopping cart
+      ↓
+Checkout
+      ↓
+3 scenarios passed
+```
+
+### Regression Coverage
+
+```text
+Locked user validation
+        ↓
+Shopping cart
+        ↓
+Checkout
+        ↓
+3 scenarios passed
+```
+
+The filtered scenario shown as `pending` is expected behavior from tag filtering: the scenario exists in the feature file but does not belong to the selected execution tag.
 
 ---
 
@@ -382,6 +484,18 @@ This reduces duplication and improves readability.
 
 Keeping test data outside test implementation makes scenarios easier to maintain and helps avoid hardcoded information throughout the suite.
 
+### Why Stable Selectors?
+
+Using `data-test` selectors reduces dependency on layout and styling changes.
+
+This makes the automation less fragile when visual implementation changes without affecting business behavior.
+
+### Why Smoke and Regression Tags?
+
+Tags allow the same BDD framework to support different testing objectives.
+
+Smoke scenarios prioritize fast validation of critical flows, while regression scenarios provide broader functional confidence.
+
 ### Why GitHub Actions?
 
 Continuous integration provides a repeatable execution environment and demonstrates that the framework can execute independently of a local machine.
@@ -392,7 +506,7 @@ Continuous integration provides a repeatable execution environment and demonstra
 
 This project demonstrates practical experience with:
 
-`Cypress` • `TypeScript` • `BDD` • `Cucumber` • `Gherkin` • `E2E Testing` • `Page Object Model` • `Custom Commands` • `Smoke Testing` • `Regression Testing` • `Test Data Management` • `Stable Selectors` • `GitHub Actions` • `CI/CD`
+`Cypress` • `TypeScript` • `BDD` • `Cucumber` • `Gherkin` • `E2E Testing` • `Page Object Model` • `Custom Commands` • `Smoke Testing` • `Regression Testing` • `Test Data Management` • `Stable Selectors` • `Tag-Based Execution` • `Test Evidence` • `GitHub Actions` • `CI/CD`
 
 ---
 
@@ -401,7 +515,6 @@ This project demonstrates practical experience with:
 Possible future improvements:
 
 - [ ] Scenario Outline with multiple test data combinations
-- [ ] Execution by Cucumber tags
 - [ ] Dedicated Cucumber HTML report
 - [ ] API interception and validation with `cy.intercept()`
 - [ ] Accessibility testing
