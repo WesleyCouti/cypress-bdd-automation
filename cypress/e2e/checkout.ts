@@ -13,15 +13,24 @@ const checkoutPage = new CheckoutPage();
 
 Given('I have {string} in my cart', (productName: string) => {
   loginPage.visit();
-  loginPage.login(users.standard.username, users.standard.password);
+
+  loginPage.login(
+    users.standard.username,
+    users.standard.password
+  );
+
   inventoryPage.assertLoaded();
   inventoryPage.addProduct(productName);
+  inventoryPage.assertCartCount(1);
   inventoryPage.openCart();
+
+  cartPage.assertCartLoaded();
   cartPage.assertProduct(productName);
 });
 
 When('I complete the checkout with valid customer data', () => {
   cartPage.startCheckout();
+
   checkoutPage.fillCustomerData(checkoutCustomer);
   checkoutPage.finishOrder();
 });
