@@ -1,7 +1,12 @@
 export class LoginPage {
+  private readonly loginButton = '[data-test="login-button"]';
+  private readonly errorMessage = '[data-test="error"]';
+
   visit(): void {
     cy.visit('/');
-    cy.get('[data-test="login-button"]').should('be.visible');
+
+    cy.get(this.loginButton)
+      .should('be.visible');
   }
 
   login(username: string, password: string): void {
@@ -9,7 +14,7 @@ export class LoginPage {
   }
 
   assertError(message: string): void {
-    cy.get('[data-test="error"]')
+    cy.get(this.errorMessage)
       .should('be.visible')
       .and('contain.text', message);
   }
