@@ -4,7 +4,7 @@ Feature: Shopping cart
   I want to add products to my cart
   So that I can review my purchase before checkout
 
-  @regression
+  @smoke @regression
   Scenario: Add a product to the cart
     Given I am authenticated in the product catalog
     When I add "Sauce Labs Backpack" to the cart
