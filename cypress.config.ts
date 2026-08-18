@@ -4,8 +4,6 @@ import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-prepro
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild';
 
 export default defineConfig({
-  allowCypressEnv: false,
-
   video: true,
   videoCompression: 32,
   screenshotOnRunFailure: true,
