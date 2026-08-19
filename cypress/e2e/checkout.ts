@@ -6,10 +6,14 @@ import { CheckoutPage } from '../pages/CheckoutPage';
 import { users } from '../data/users';
 import { checkoutCustomer } from '../data/checkout';
 
+
 const loginPage = new LoginPage();
 const inventoryPage = new InventoryPage();
 const cartPage = new CartPage();
 const checkoutPage = new CheckoutPage();
+
+const requiredFirstNameError = 'Error: First Name is required';
+
 
 Given('I have {string} in my cart', (productName: string) => {
   loginPage.visit();
@@ -28,6 +32,7 @@ Given('I have {string} in my cart', (productName: string) => {
   cartPage.assertProduct(productName);
 });
 
+
 When('I complete the checkout with valid customer data', () => {
   cartPage.startCheckout();
 
@@ -35,6 +40,18 @@ When('I complete the checkout with valid customer data', () => {
   checkoutPage.finishOrder();
 });
 
+
+When('I continue the checkout without customer data', () => {
+  cartPage.startCheckout();
+  checkoutPage.continueCheckout();
+});
+
+
 Then('the order should be completed successfully', () => {
   checkoutPage.assertCompleted();
+});
+
+
+Then('I should see the required first name error', () => {
+  checkoutPage.assertError(requiredFirstNameError);
 });

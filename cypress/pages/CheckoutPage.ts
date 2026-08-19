@@ -11,6 +11,7 @@ export class CheckoutPage {
   private readonly continueButton = '[data-test="continue"]';
   private readonly finishButton = '[data-test="finish"]';
   private readonly completeHeader = '[data-test="complete-header"]';
+  private readonly errorMessage = '[data-test="error"]';
 
   fillCustomerData(data: CheckoutData): void {
     cy.get(this.firstNameInput)
@@ -28,12 +29,16 @@ export class CheckoutPage {
       .clear()
       .type(data.postalCode);
 
+    this.continueCheckout();
+
+    cy.url().should('include', '/checkout-step-two.html');
+  }
+
+  continueCheckout(): void {
     cy.get(this.continueButton)
       .should('be.visible')
       .and('be.enabled')
       .click();
-
-    cy.url().should('include', '/checkout-step-two.html');
   }
 
   finishOrder(): void {
@@ -49,5 +54,11 @@ export class CheckoutPage {
     cy.get(this.completeHeader)
       .should('be.visible')
       .and('have.text', 'Thank you for your order!');
+  }
+
+  assertError(message: string): void {
+    cy.get(this.errorMessage)
+      .should('be.visible')
+      .and('contain.text', message);
   }
 }
