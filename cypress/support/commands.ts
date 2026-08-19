@@ -1,7 +1,10 @@
+import { users } from '../data/users';
+
 declare global {
   namespace Cypress {
     interface Chainable {
       login(username: string, password: string): Chainable<void>;
+      loginAsStandardUser(): Chainable<void>;
     }
   }
 }
@@ -33,6 +36,15 @@ Cypress.Commands.add('login', (username: string, password: string) => {
     .should('be.visible')
     .and('be.enabled')
     .click();
+});
+
+Cypress.Commands.add('loginAsStandardUser', () => {
+  cy.visit('/');
+
+  cy.login(
+    users.standard.username,
+    users.standard.password
+  );
 });
 
 export {};
