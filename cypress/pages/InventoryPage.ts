@@ -1,6 +1,7 @@
 export class InventoryPage {
   private readonly title = '[data-test="title"]';
   private readonly inventoryItem = '[data-test="inventory-item"]';
+  private readonly inventoryItemName = '[data-test="inventory-item-name"]';
   private readonly cartBadge = '[data-test="shopping-cart-badge"]';
   private readonly cartLink = '[data-test="shopping-cart-link"]';
   private readonly sortSelect = '[data-test="product-sort-container"]';
@@ -27,10 +28,10 @@ export class InventoryPage {
       });
   }
 
-  sortByPriceLowToHigh(): void {
+  sortProducts(option: string): void {
     cy.get(this.sortSelect)
       .should('be.visible')
-      .select('lohi');
+      .select(option);
   }
 
   assertProductsSortedByPriceLowToHigh(): void {
@@ -44,6 +45,26 @@ export class InventoryPage {
         const sortedPrices = [...prices].sort((a, b) => a - b);
 
         expect(prices).to.deep.equal(sortedPrices);
+      });
+  }
+
+  assertProductsSortedByName(order: 'ascending' | 'descending'): void {
+    cy.get(this.inventoryItemName)
+      .should('have.length.greaterThan', 1)
+      .then(($names) => {
+        const names = [...$names].map(
+          (element) => element.textContent?.trim() ?? ''
+        );
+
+        const sortedNames = [...names].sort((a, b) =>
+          a.localeCompare(b)
+        );
+
+        if (order === 'descending') {
+          sortedNames.reverse();
+        }
+
+        expect(names).to.deep.equal(sortedNames);
       });
   }
 

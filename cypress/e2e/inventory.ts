@@ -11,11 +11,21 @@ Given('I am authenticated in the product catalog', () => {
 });
 
 
-When('I sort the products by price from low to high', () => {
-  inventoryPage.sortByPriceLowToHigh();
+When('I sort the products using {string}', (sortOption: string) => {
+  inventoryPage.sortProducts(sortOption);
 });
 
 
 Then('the products should be displayed in ascending price order', () => {
   inventoryPage.assertProductsSortedByPriceLowToHigh();
 });
+
+
+Then(
+  'the products should be displayed in {string} alphabetical order',
+  (order: string) => {
+    inventoryPage.assertProductsSortedByName(
+      order as 'ascending' | 'descending'
+    );
+  }
+);
