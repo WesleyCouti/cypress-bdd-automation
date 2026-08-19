@@ -4,7 +4,7 @@ Feature: Authentication
   I want to authenticate in the application
   So that I can access the product catalog
 
-  @smoke
+  @smoke @regression
   Scenario: Successful login
     Given I am on the login page
     When I authenticate with valid credentials
