@@ -15,3 +15,9 @@ Feature: Authentication
     Given I am on the login page
     When I authenticate with locked user credentials
     Then I should see the locked user error message
+
+  @regression
+  Scenario: Username is required
+    Given I am on the login page
+    When I try to authenticate without a username
+    Then I should see the required username error

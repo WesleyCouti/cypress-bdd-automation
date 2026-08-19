@@ -8,5 +8,9 @@ export const users = {
     username: 'locked_out_user',
     password: 'secret_sauce',
     errorMessage: 'Sorry, this user has been locked out'
+  },
+
+  validation: {
+    usernameRequired: 'Username is required'
   }
 } as const;

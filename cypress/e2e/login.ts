@@ -29,6 +29,14 @@ When('I authenticate with locked user credentials', () => {
 });
 
 
+When('I try to authenticate without a username', () => {
+  loginPage.login(
+    '',
+    users.standard.password
+  );
+});
+
+
 Then('the product catalog should be displayed', () => {
   inventoryPage.assertLoaded();
 });
@@ -36,4 +44,9 @@ Then('the product catalog should be displayed', () => {
 
 Then('I should see the locked user error message', () => {
   loginPage.assertError(users.locked.errorMessage);
+});
+
+
+Then('I should see the required username error', () => {
+  loginPage.assertError(users.validation.usernameRequired);
 });

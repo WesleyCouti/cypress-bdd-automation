@@ -13,13 +13,21 @@ const loginButton = '[data-test="login-button"]';
 Cypress.Commands.add('login', (username: string, password: string) => {
   cy.get(usernameInput)
     .should('be.visible')
-    .clear()
-    .type(username);
+    .clear();
+
+  if (username) {
+    cy.get(usernameInput)
+      .type(username);
+  }
 
   cy.get(passwordInput)
     .should('be.visible')
-    .clear()
-    .type(password, { log: false });
+    .clear();
+
+  if (password) {
+    cy.get(passwordInput)
+      .type(password, { log: false });
+  }
 
   cy.get(loginButton)
     .should('be.visible')
