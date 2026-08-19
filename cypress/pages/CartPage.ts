@@ -1,4 +1,5 @@
 export class CartPage {
+  private readonly cartItem = '[data-test="inventory-item"]';
   private readonly productName = '[data-test="inventory-item-name"]';
   private readonly checkoutButton = '[data-test="checkout"]';
 
@@ -12,6 +13,21 @@ export class CartPage {
   assertProduct(productName: string): void {
     cy.contains(this.productName, productName)
       .should('be.visible');
+  }
+
+  removeProduct(productName: string): void {
+    cy.contains(this.cartItem, productName)
+      .should('be.visible')
+      .within(() => {
+        cy.contains('button', 'Remove')
+          .should('be.visible')
+          .click();
+      });
+  }
+
+  assertEmpty(): void {
+    cy.get(this.cartItem)
+      .should('not.exist');
   }
 
   startCheckout(): void {
