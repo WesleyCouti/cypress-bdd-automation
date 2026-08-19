@@ -18,6 +18,7 @@ This project is part of my **QA Automation portfolio** and demonstrates how I st
 - esbuild
 - Page Object Model
 - Custom Commands
+- Scenario Outline
 - GitHub Actions
 - CI/CD
 
@@ -31,17 +32,32 @@ The automated suite covers critical user flows against the public **SauceDemo** 
 
 - Successful login
 - Locked user validation
+- Required field validation
+- Reusable authentication through Cypress Custom Commands
+
+### Product Catalog
+
+- Product catalog validation
+- Sort products by price from low to high
+- Sort products alphabetically from A to Z
+- Sort products alphabetically from Z to A
+- Parameterized sorting behavior
+- Scenario Outline for multiple sorting combinations
 
 ### Shopping Cart
 
 - Add product to cart
+- Remove product from cart
 - Validate cart quantity
 - Validate selected product
+- Validate empty cart state
 
 ### Checkout
 
 - Add product before checkout
 - Fill customer information
+- Validate required customer information
+- Validate product and price in the order summary
 - Complete purchase flow
 - Validate order confirmation
 
@@ -64,6 +80,23 @@ Scenario: Complete checkout successfully
 The `.feature` files describe business behavior while TypeScript step definitions implement the automation.
 
 This approach helps keep test scenarios understandable for both technical and non-technical stakeholders.
+
+The project also uses **Scenario Outline** to execute the same business behavior with different data combinations.
+
+Example:
+
+```gherkin
+@regression
+Scenario Outline: Sort products alphabetically
+  Given I am authenticated in the product catalog
+  When I sort the products using "<sortOption>"
+  Then the products should be displayed in "<order>" alphabetical order
+
+  Examples:
+    | sortOption | order      |
+    | az         | ascending  |
+    | za         | descending |
+```
 
 ---
 
@@ -120,6 +153,8 @@ cypress-bdd-automation/
 │   │   ├── cart.ts
 │   │   ├── checkout.feature
 │   │   ├── checkout.ts
+│   │   ├── inventory.feature
+│   │   ├── inventory.ts
 │   │   ├── login.feature
 │   │   └── login.ts
 │   │
@@ -134,6 +169,7 @@ cypress-bdd-automation/
 │       └── e2e.ts
 │
 ├── cypress.config.ts
+├── package-lock.json
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -143,9 +179,9 @@ cypress-bdd-automation/
 
 | Directory | Responsibility |
 |---|---|
-| `cypress/e2e/` | Gherkin scenarios and step definitions |
-| `cypress/pages/` | Page interactions and reusable UI behavior |
-| `cypress/data/` | Reusable test data |
+| `cypress/e2e/` | Gherkin scenarios and TypeScript step definitions |
+| `cypress/pages/` | Page interactions, selectors and reusable UI behavior |
+| `cypress/data/` | Reusable and centralized test data |
 | `cypress/support/` | Cypress custom commands and global setup |
 | `.github/workflows/` | Continuous integration pipeline |
 
@@ -157,25 +193,31 @@ The framework was structured around principles commonly applied to maintainable 
 
 ### Business-Readable Scenarios
 
-BDD scenarios describe behavior using **Given / When / Then**, keeping test intent separated from automation implementation.
+BDD scenarios describe expected behavior using **Given / When / Then**, keeping test intent separated from automation implementation.
 
 ### Maintainability
 
-Page interactions are encapsulated inside Page Objects.
+Page interactions and selectors are encapsulated inside Page Objects.
 
 This reduces duplicated selectors and helps isolate UI changes from business scenarios.
 
 ### Reusability
 
-Common actions such as authentication are implemented through reusable Cypress custom commands.
+Common actions are implemented through reusable Cypress Custom Commands.
 
-Example:
+The project provides generic authentication:
 
 ```typescript
 cy.login(username, password);
 ```
 
-This prevents repeated login implementation across multiple scenarios.
+And reusable authentication for the standard test user:
+
+```typescript
+cy.loginAsStandardUser();
+```
+
+This prevents repeated authentication implementation across multiple scenarios.
 
 ### Test Data Management
 
@@ -195,7 +237,21 @@ Tests rely on Cypress retryability and assertions instead of fixed waits.
 
 This reduces unnecessary timing dependencies and improves execution stability.
 
-### Smoke and Regression Execution
+### Parameterized Testing
+
+Reusable methods and Scenario Outlines are used when the same behavior needs to be validated against different conditions.
+
+Product sorting, for example, uses a reusable Page Object method:
+
+```typescript
+sortProducts(option);
+```
+
+This supports different sorting strategies without duplicating interaction logic.
+
+---
+
+## Smoke and Regression Strategy
 
 BDD scenarios are classified using Cucumber tags:
 
@@ -204,53 +260,43 @@ BDD scenarios are classified using Cucumber tags:
 @regression
 ```
 
-These tags are actively used by GitHub Actions to run dedicated test suites.
+These tags are actively used by GitHub Actions to execute dedicated suites.
 
-#### Smoke Suite
+### Smoke Suite
 
-```bash
-npx cypress run --env tags="@smoke"
-```
+The Smoke suite focuses on fast validation of the application's most critical business flows.
 
-Validated CI execution:
+Examples include:
 
-```text
-3 scenarios passed
-0 failed
-1 scenario filtered as pending
-```
+- Successful authentication
+- Shopping cart
+- Successful checkout
 
-The smoke suite currently validates:
-
-- Successful login
-- Add product to cart
-- Complete checkout
-
-#### Regression Suite
+Run with:
 
 ```bash
-npx cypress run --env tags="@regression"
+npm run test:smoke
 ```
 
-Validated CI execution:
+### Regression Suite
 
-```text
-3 scenarios passed
-0 failed
-1 scenario filtered as pending
+The Regression suite provides broader functional coverage.
+
+It includes scenarios involving:
+
+- Authentication
+- Negative validations
+- Shopping cart behavior
+- Checkout validations
+- Product catalog sorting
+
+Run with:
+
+```bash
+npm run test:regression
 ```
 
-The regression suite currently validates:
-
-- Locked user behavior
-- Add product to cart
-- Complete checkout
-
-This approach allows critical-path validation and broader regression coverage to be executed independently.
-
-### Continuous Integration
-
-The automation suite is executed through GitHub Actions in a clean CI environment.
+This strategy allows critical-path validation and broader regression coverage to execute independently.
 
 ---
 
@@ -273,11 +319,13 @@ Enter the project directory:
 cd cypress-bdd-automation
 ```
 
-Install dependencies:
+Install dependencies using the committed lockfile:
 
 ```bash
-npm install
+npm ci
 ```
+
+Using `npm ci` provides deterministic dependency installation based on `package-lock.json`, which is also used by the CI pipeline.
 
 ---
 
@@ -316,13 +364,13 @@ npm run typecheck
 Run the Smoke suite:
 
 ```bash
-npx cypress run --env tags="@smoke"
+npm run test:smoke
 ```
 
 Run the Regression suite:
 
 ```bash
-npx cypress run --env tags="@regression"
+npm run test:regression
 ```
 
 ---
@@ -341,7 +389,7 @@ The project uses **GitHub Actions** to execute independent Smoke and Regression 
                      Setup Node.js
                           │
                           ▼
-                  Install Dependencies
+                       npm ci
                           │
                           ▼
                  TypeScript Validation
@@ -362,50 +410,27 @@ The project uses **GitHub Actions** to execute independent Smoke and Regression 
              on failure         Artifacts
 ```
 
-The workflow can also be manually triggered through the **Actions** tab.
+The pipeline runs automatically on pushes and pull requests to the main branch and can also be manually triggered through the **Actions** tab.
 
 The current pipeline status is displayed by the badge at the top of this README.
 
 ---
 
-## CI Execution
+## Continuous Integration
 
-The BDD test strategy is continuously validated through dedicated GitHub Actions jobs.
+Each CI execution runs the project in a clean Linux environment.
 
-### Current Validation
+The workflow performs:
 
-| Suite | Scenarios Passed | Failed | Filtered |
-|---|---:|---:|---:|
-| Smoke | 3 | 0 | 1 |
-| Regression | 3 | 0 | 1 |
+1. Repository checkout
+2. Node.js setup
+3. Deterministic dependency installation with `npm ci`
+4. TypeScript validation
+5. Smoke execution
+6. Regression execution
+7. Evidence upload through GitHub Actions artifacts
 
-Both suites currently pass successfully in CI.
-
-### Smoke Coverage
-
-```text
-Successful login
-      ↓
-Shopping cart
-      ↓
-Checkout
-      ↓
-3 scenarios passed
-```
-
-### Regression Coverage
-
-```text
-Locked user validation
-        ↓
-Shopping cart
-        ↓
-Checkout
-        ↓
-3 scenarios passed
-```
-
-The filtered scenario shown as `pending` is expected behavior from tag filtering: the scenario exists in the feature file but does not belong to the selected execution tag.
+Smoke and Regression are executed as independent jobs, making their results clearly visible in the GitHub Actions interface.
 
 ---
 
@@ -417,13 +442,15 @@ The Cypress configuration generates execution evidence to support failure analys
 
 Screenshots are automatically generated when tests fail.
 
+Failed-test screenshots are uploaded as GitHub Actions artifacts.
+
 ### Videos
 
 Video recording is enabled for automated runs.
 
-In CI, videos are uploaded as GitHub Actions artifacts after execution.
+Videos are uploaded as GitHub Actions artifacts after execution.
 
-These artifacts help investigate test failures without immediately reproducing the scenario locally.
+These artifacts help investigate failures without immediately reproducing the scenario locally.
 
 ---
 
@@ -476,9 +503,15 @@ This keeps step definitions focused on behavior instead of implementation detail
 
 ### Why Custom Commands?
 
-Custom commands are useful for reusable actions shared across different scenarios, such as login.
+Custom Commands are useful for reusable actions shared across different scenarios, such as authentication.
 
 This reduces duplication and improves readability.
+
+### Why Scenario Outline?
+
+Scenario Outline allows the same business behavior to be validated against multiple data combinations without duplicating scenarios.
+
+The product catalog sorting tests demonstrate this approach.
 
 ### Why Separate Test Data?
 
@@ -496,9 +529,15 @@ Tags allow the same BDD framework to support different testing objectives.
 
 Smoke scenarios prioritize fast validation of critical flows, while regression scenarios provide broader functional confidence.
 
+### Why npm ci?
+
+The project commits its `package-lock.json` and uses `npm ci` in continuous integration.
+
+This provides predictable dependency versions and makes CI executions more reproducible.
+
 ### Why GitHub Actions?
 
-Continuous integration provides a repeatable execution environment and demonstrates that the framework can execute independently of a local machine.
+Continuous integration provides a repeatable execution environment and demonstrates that the framework can execute independently of a local development machine.
 
 ---
 
@@ -506,7 +545,7 @@ Continuous integration provides a repeatable execution environment and demonstra
 
 This project demonstrates practical experience with:
 
-`Cypress` • `TypeScript` • `BDD` • `Cucumber` • `Gherkin` • `E2E Testing` • `Page Object Model` • `Custom Commands` • `Smoke Testing` • `Regression Testing` • `Test Data Management` • `Stable Selectors` • `Tag-Based Execution` • `Test Evidence` • `GitHub Actions` • `CI/CD`
+`Cypress` • `TypeScript` • `BDD` • `Cucumber` • `Gherkin` • `E2E Testing` • `Page Object Model` • `Custom Commands` • `Scenario Outline` • `Smoke Testing` • `Regression Testing` • `Negative Testing` • `Test Data Management` • `Stable Selectors` • `Parameterized Testing` • `Tag-Based Execution` • `Test Evidence` • `GitHub Actions` • `CI/CD`
 
 ---
 
@@ -514,13 +553,13 @@ This project demonstrates practical experience with:
 
 Possible future improvements:
 
-- [ ] Scenario Outline with multiple test data combinations
 - [ ] Dedicated Cucumber HTML report
 - [ ] API interception and validation with `cy.intercept()`
 - [ ] Accessibility testing
 - [ ] Multi-environment configuration
 - [ ] Parallel execution strategy
-- [ ] Additional negative scenarios
+
+The current version already provides a complete foundation for maintainable BDD E2E automation and CI execution.
 
 ---
 
