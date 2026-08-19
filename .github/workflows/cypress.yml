@@ -17,10 +17,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -31,22 +31,22 @@ jobs:
         run: npm run typecheck
 
       - name: Run Cypress regression tests
-        run: npx cypress run --env tags="@regression"
+        run: npm run test:regression
 
       - name: Upload screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: cypress-screenshots
+          name: cypress-regression-screenshots
           path: cypress/screenshots/
           if-no-files-found: ignore
           retention-days: 14
 
       - name: Upload videos
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: cypress-videos
+          name: cypress-regression-videos
           path: cypress/videos/
           if-no-files-found: ignore
           retention-days: 14
@@ -58,15 +58,36 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
       - name: Install dependencies
         run: npm install
 
+      - name: Run type check
+        run: npm run typecheck
+
       - name: Run Cypress smoke tests
-        run: npx cypress run --env tags="@smoke"
+        run: npm run test:smoke
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cypress-smoke-screenshots
+          path: cypress/screenshots/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cypress-smoke-videos
+          path: cypress/videos/
+          if-no-files-found: ignore
+          retention-days: 14
