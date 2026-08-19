@@ -8,7 +8,8 @@ Feature: Checkout
   Scenario: Complete checkout successfully
     Given I have "Sauce Labs Bike Light" in my cart
     When I complete the checkout with valid customer data
-    Then the order should be completed successfully
+    Then I should see "Sauce Labs Bike Light" with price "$9.99" in the order summary
+    And the order should be completed successfully
 
   @regression
   Scenario: Required checkout information is not provided

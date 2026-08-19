@@ -12,6 +12,9 @@ export class CheckoutPage {
   private readonly finishButton = '[data-test="finish"]';
   private readonly completeHeader = '[data-test="complete-header"]';
   private readonly errorMessage = '[data-test="error"]';
+  private readonly inventoryItemName = '[data-test="inventory-item-name"]';
+  private readonly inventoryItemPrice = '[data-test="inventory-item-price"]';
+  private readonly totalLabel = '[data-test="total-label"]';
 
   fillCustomerData(data: CheckoutData): void {
     cy.get(this.firstNameInput)
@@ -39,6 +42,19 @@ export class CheckoutPage {
       .should('be.visible')
       .and('be.enabled')
       .click();
+  }
+
+  assertOrderSummary(productName: string, productPrice: string): void {
+    cy.contains(this.inventoryItemName, productName)
+      .should('be.visible');
+
+    cy.get(this.inventoryItemPrice)
+      .should('be.visible')
+      .and('have.text', productPrice);
+
+    cy.get(this.totalLabel)
+      .should('be.visible')
+      .and('contain.text', 'Total:');
   }
 
   finishOrder(): void {

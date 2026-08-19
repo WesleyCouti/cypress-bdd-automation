@@ -35,9 +35,7 @@ Given('I have {string} in my cart', (productName: string) => {
 
 When('I complete the checkout with valid customer data', () => {
   cartPage.startCheckout();
-
   checkoutPage.fillCustomerData(checkoutCustomer);
-  checkoutPage.finishOrder();
 });
 
 
@@ -45,6 +43,15 @@ When('I continue the checkout without customer data', () => {
   cartPage.startCheckout();
   checkoutPage.continueCheckout();
 });
+
+
+Then(
+  'I should see {string} with price {string} in the order summary',
+  (productName: string, productPrice: string) => {
+    checkoutPage.assertOrderSummary(productName, productPrice);
+    checkoutPage.finishOrder();
+  }
+);
 
 
 Then('the order should be completed successfully', () => {
