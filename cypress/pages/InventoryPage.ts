@@ -3,6 +3,8 @@ export class InventoryPage {
   private readonly inventoryItem = '[data-test="inventory-item"]';
   private readonly cartBadge = '[data-test="shopping-cart-badge"]';
   private readonly cartLink = '[data-test="shopping-cart-link"]';
+  private readonly sortSelect = '[data-test="product-sort-container"]';
+  private readonly itemPrice = '[data-test="inventory-item-price"]';
 
   assertLoaded(): void {
     cy.url().should('include', '/inventory.html');
@@ -22,6 +24,26 @@ export class InventoryPage {
         cy.contains('button', 'Add to cart')
           .should('be.visible')
           .click();
+      });
+  }
+
+  sortByPriceLowToHigh(): void {
+    cy.get(this.sortSelect)
+      .should('be.visible')
+      .select('lohi');
+  }
+
+  assertProductsSortedByPriceLowToHigh(): void {
+    cy.get(this.itemPrice)
+      .should('have.length.greaterThan', 1)
+      .then(($prices) => {
+        const prices = [...$prices].map((element) =>
+          Number(element.textContent?.replace('$', '') ?? 0)
+        );
+
+        const sortedPrices = [...prices].sort((a, b) => a - b);
+
+        expect(prices).to.deep.equal(sortedPrices);
       });
   }
 
